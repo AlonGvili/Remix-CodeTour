@@ -18,4 +18,4 @@ https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour
 
 The end!
 
-now you can work through the tutorial in cool and easy way
+now you can work thru the tutorial in cool and easy way
