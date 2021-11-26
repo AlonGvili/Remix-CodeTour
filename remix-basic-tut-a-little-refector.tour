@@ -1,0 +1,34 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "03.A Little Refactoring",
+  "steps": [
+    {
+      "title": "Create new post.ts",
+      "description": "A solid practice is to create a module that deals with a particular concern. In our case it's going to be reading and writing posts. Let's set that up now and add a getPosts export to our module.\r\n\r\non linux and mac\r\n>> touch app/post.ts\r\n\r\non windows\r\n>> new-item -path .\\app -name post.ts"
+    },
+    {
+      "file": "app/post.ts",
+      "description": "We're mostly gonna copy/paste it from our route:\r\n\r\n```ts\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport function getPosts() {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\"\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\"\r\n    }\r\n  ];\r\n  return posts;\r\n}\r\n```",
+      "line": 18,
+      "title": "Create getPosts function",
+      "contents": "export type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport function getPosts() {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "selection": {
+        "start": {
+          "line": 2,
+          "character": 1
+        },
+        "end": {
+          "line": 19,
+          "character": 3
+        }
+      },
+      "description": "\r\n💿 Update the posts route to use our new posts module\r\n\r\n```tsx\r\nimport { getPosts } from \"~/post\";\r\nimport type { Post } from \"~/post\";\r\n\r\nexport let loader = () => {\r\n  return getPosts();\r\n};\r\n\r\n```",
+      "line": null,
+      "title": "Update the posts route to use our new posts module",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\nimport { getPosts } from \"~/post\";\r\nimport type { Post } from \"~/post\";\r\n\r\nexport let loader = () => {\r\n  return getPosts();\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    }
+  ]
+}
