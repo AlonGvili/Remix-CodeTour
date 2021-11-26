@@ -1,0 +1,83 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "04.Pulling from a data source",
+  "steps": [
+    {
+      "directory": "",
+      "description": "If we were building this for real, we'd want to store our posts in a database somewhere like Postgres, FauanaDB, Supabase, etc. This is a quickstart, so we're just going to use the file system.\r\n\r\nInstead of hard-coding our links, we'll read them from the file system.\r\n\r\n💿 Create a \"posts/\" folder in the root of the project, not in the app directory, but next to it.\r\n\r\n>> mkdir posts",
+      "title": "Create new posts folder"
+    },
+    {
+      "directory": "posts",
+      "description": "Now add some posts\r\n\r\non linux and mac\r\n\r\n>> touch posts/my-first-post.md\r\n\r\n>> touch posts/90s-mixtape.md\r\n\r\non windows\r\n\r\n>> new-item -path .\\posts -name my-first-post.md\r\n\r\n>> new-item -path .\\posts -name 90s-mixtape.md",
+      "title": "Add some posts"
+    },
+    {
+      "file": "posts/my-first-post.md",
+      "description": "Put whatever you want in them, but make sure they've got some \"front matter\" attributes in them with a title\r\n\r\n```markdown\r\n---\r\ntitle: My First Post\r\n---\r\n\r\n# This is my first post\r\n\r\nIsn't it great?\r\n```",
+      "line": 13,
+      "title": "Add content to my-first-post.md",
+      "contents": "---\r\ntitle: My First Post\r\n---\r\n\r\n# This is my first post\r\n\r\nIsn't it great?\r\n"
+    },
+    {
+      "file": "posts/90s-mixtape.md",
+      "description": "Put whatever you want in them, but make sure they've got some \"front matter\" attributes in them with a title\r\n\r\n```markdown\r\n---\r\ntitle: 90s Mixtape\r\n---\r\n\r\n# 90s Mixtape\r\n\r\n- I wish (Skee-Lo)\r\n- This Is How We Do It (Montell Jordan)\r\n- Everlong (Foo Fighters)\r\n- Ms. Jackson (Outkast)\r\n- Interstate Love Song (Stone Temple Pilots)\r\n- Killing Me Softly With His Song (Fugees, Ms. Lauryn Hill)\r\n- Just a Friend (Biz Markie)\r\n- The Man Who Sold The World (Nirvana)\r\n- Semi-Charmed Life (Third Eye Blind)\r\n- ...Baby One More Time (Britney Spears)\r\n- Better Man (Pearl Jam)\r\n- It's All Coming Back to Me Now (Céline Dion)\r\n- This Kiss (Faith Hill)\r\n- Fly Away (Lenny Kravits)\r\n- Scar Tissue (Red Hot Chili Peppers)\r\n- Santa Monica (Everclear)\r\n- C'mon N' Ride it (Quad City DJ's)\r\n```",
+      "line": 45,
+      "title": "Add content to 90s-mixtape.md",
+      "contents": "---\r\ntitle: 90s Mixtape\r\n---\r\n\r\n# 90s Mixtape\r\n\r\n- I wish (Skee-Lo)\r\n- This Is How We Do It (Montell Jordan)\r\n- Everlong (Foo Fighters)\r\n- Ms. Jackson (Outkast)\r\n- Interstate Love Song (Stone Temple Pilots)\r\n- Killing Me Softly With His Song (Fugees, Ms. Lauryn Hill)\r\n- Just a Friend (Biz Markie)\r\n- The Man Who Sold The World (Nirvana)\r\n- Semi-Charmed Life (Third Eye Blind)\r\n- ...Baby One More Time (Britney Spears)\r\n- Better Man (Pearl Jam)\r\n- It's All Coming Back to Me Now (Céline Dion)\r\n- This Kiss (Faith Hill)\r\n- Fly Away (Lenny Kravits)\r\n- Scar Tissue (Red Hot Chili Peppers)\r\n- Santa Monica (Everclear)\r\n- C'mon N' Ride it (Quad City DJ's)\r\n"
+    },
+    {
+      "title": "Add front-matter package",
+      "description": "💿 Update getPosts to read from the file system\r\n\r\nWe'll need a node module for this:\r\n\r\n>> npm add front-matter"
+    },
+    {
+      "file": "app/post.ts",
+      "selection": {
+        "start": {
+          "line": 1,
+          "character": 1
+        },
+        "end": {
+          "line": 19,
+          "character": 1
+        }
+      },
+      "description": "Update post.ts file\r\n\r\n```ts\r\nimport path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async filename => {\r\n      let file = await fs.readFile(\r\n        path.join(postsPath, filename)\r\n      );\r\n      let { attributes } = parseFrontMatter(\r\n        file.toString()\r\n      );\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title\r\n      };\r\n    })\r\n  );\r\n}\r\n```\r\n",
+      "line": null,
+      "title": "Update post.ts file",
+      "contents": "import path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\nimport invariant from \"tiny-invariant\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async (filename) => {\r\n      let file = await fs.readFile(path.join(postsPath, filename));\r\n      let { attributes } = parseFrontMatter(file.toString());\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title,\r\n      };\r\n    })\r\n  );\r\n}\r\n"
+    },
+    {
+      "title": "Add tiny-invariant package",
+      "description": "TypeScript is gonna be mad at that code, let's make it happy.\r\n\r\nSince we're reading in a file, the type system has no idea what's in there, so we need a runtime check, for that we'll want an invariant method to make runtime checks like this easy.\r\n\r\n💿 Ensure our posts have the proper meta data and get type safety\r\n\r\n>> npm add tiny-invariant"
+    },
+    {
+      "file": "app/post.ts",
+      "description": "Import invariant\r\n\r\n```ts\r\nimport invariant from \"tiny-invariant\";\r\n```",
+      "line": 4,
+      "title": "Import invariant",
+      "contents": "import path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\nimport invariant from \"tiny-invariant\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async (filename) => {\r\n      let file = await fs.readFile(path.join(postsPath, filename));\r\n      let { attributes } = parseFrontMatter(file.toString());\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title,\r\n      };\r\n    })\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/post.ts",
+      "description": "Exprot new PostMarkdownAttributes type\r\n \r\n```ts\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n```",
+      "line": 13,
+      "title": "Exprot new PostMarkdownAttributes type",
+      "contents": "import path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\nimport invariant from \"tiny-invariant\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async (filename) => {\r\n      let file = await fs.readFile(path.join(postsPath, filename));\r\n      let { attributes } = parseFrontMatter(file.toString());\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title,\r\n      };\r\n    })\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/post.ts",
+      "description": "Add new validation function\r\n\r\n```ts\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n```\r\n",
+      "line": 21,
+      "title": "Add new validation function",
+      "contents": "import path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\nimport invariant from \"tiny-invariant\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async (filename) => {\r\n      let file = await fs.readFile(path.join(postsPath, filename));\r\n      let { attributes } = parseFrontMatter(file.toString());\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title,\r\n      };\r\n    })\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/post.ts",
+      "description": "use validation in our getPosts function\r\n\r\n```ts\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n```\r\n\r\nEven if you aren't using TypeScript you're going to want that invariant check so you know what's wrong, too.\r\n\r\nOkay! Back in the UI we should see our list of posts. Feel free to add some more posts, refresh, and watch the list grow.",
+      "line": 34,
+      "title": "Use validation in our getPosts function",
+      "contents": "import path from \"path\";\r\nimport fs from \"fs/promises\";\r\nimport parseFrontMatter from \"front-matter\";\r\nimport invariant from \"tiny-invariant\";\r\n\r\nexport type Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\nexport type PostMarkdownAttributes = {\r\n  title: string;\r\n};\r\n\r\n// relative to the server output not the source!\r\nlet postsPath = path.join(__dirname, \"..\", \"posts\");\r\n\r\nfunction isValidPostAttributes(\r\n  attributes: any\r\n): attributes is PostMarkdownAttributes {\r\n  return attributes?.title;\r\n}\r\n\r\nexport async function getPosts() {\r\n  let dir = await fs.readdir(postsPath);\r\n  return Promise.all(\r\n    dir.map(async (filename) => {\r\n      let file = await fs.readFile(path.join(postsPath, filename));\r\n      let { attributes } = parseFrontMatter(file.toString());\r\n\r\n      invariant(\r\n        isValidPostAttributes(attributes),\r\n        `${filename} has bad meta data!`\r\n      );\r\n\r\n      return {\r\n        slug: filename.replace(/\\.md$/, \"\"),\r\n        title: attributes.title,\r\n      };\r\n    })\r\n  );\r\n}\r\n"
+    }
+  ]
+}
