@@ -1,0 +1,84 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Loading Data",
+  "steps": [
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "Data loading is built in to Remix.\r\n\r\nIf your web dev background is primarily in the last few years you're probably used to creating two things here: an API route to provide data and a frontend component that consumes it. In Remix your frontend component is also it's own API route and it already knows how to talk to itself on the server from the browser. That is, you don't have to fetch it.\r\n\r\nIf your background is a bit farther back than that with Rails, PHP, etc. Then you can think of your Remix routes as backend views using React for templating, but then they know how to seamlessly hydrate in the browser to add some flair. It's progressive enhacement realized in its fullest.\r\n\r\nSo let's get to it and provide some data to our component.\r\n\r\n💿 Make the posts route \"loader\"\r\n\r\n```tsx\r\nimport { useLoaderData } from \"remix\";\r\n\r\nexport let loader = () => {\r\n  return [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\"\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\"\r\n    }\r\n  ];\r\n};\r\n\r\n```",
+      "line": 15,
+      "title": "Create a loader for the Posts route",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "now we can get the loader data in our component\r\n\r\n```tsx\r\n  let posts = useLoaderData();\r\n  console.log(posts);\r\n```  ",
+      "line": 18,
+      "title": "Use the loader in our component",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "Loaders are the backend \"API\" for their component and it's already wired up for you through useLoaderData. It's a little wild how blurry the line is between the client and the server in a Remix route. If you have your server and browser consoles both open, you'll note that they both logged our post data. That's because Remix rendered on the server to send a full HTML document like a traditional web framework, but it also hydrated in the client and logged there too.\r\n\r\nWe use let because it is only three letters, you can use const if you want 🙂\r\n\r\n💿 Render links to our posts\r\n\r\n```tsx\r\n      <ul>\r\n        {posts.map(post => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n      \r\n```",
+      "line": 29,
+      "title": "Render links to our posts",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "import remix Link component\r\n\r\n```tsx\r\nimport { Link, useLoaderData } from \"remix\";\r\n\r\n```",
+      "line": 2,
+      "selection": {
+        "start": {
+          "line": 1,
+          "character": 1
+        },
+        "end": {
+          "line": 1,
+          "character": 39
+        }
+      },
+      "title": "Import Remix Link component",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "TypeScript is mad, so let's help it out:\r\n\r\n💿 Add the Post type and generic for useLoaderData\r\n\r\n```tsx\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\n```",
+      "line": 6,
+      "title": "Add the Post type",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "selection": {
+        "start": {
+          "line": 7,
+          "character": 1
+        },
+        "end": {
+          "line": 19,
+          "character": 1
+        }
+      },
+      "description": "update our loader to use Post type\r\n\r\n```tsx\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\"\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\"\r\n    }\r\n  ];\r\n  return posts;\r\n};\r\n```",
+      "line": null,
+      "title": "Update the loader to use Post type",
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    },
+    {
+      "file": "app/routes/posts/index.tsx",
+      "description": "Update useLoaderData to use Post type\r\n\r\n```tsx\r\nlet posts = useLoaderData<Post[]>();\r\n\r\n```\r\n\r\nHey, that's pretty cool. We get a pretty solid degree of type safety even over a network request because it's all defined in the same file. Unless the network blows up while Remix fetches the data, you've got type safety in this component and it's API (remember, the component is already its own API route).",
+      "line": 23,
+      "selection": {
+        "start": {
+          "line": 22,
+          "character": 3
+        },
+        "end": {
+          "line": 22,
+          "character": 31
+        }
+      },
+      "contents": "import { Link, useLoaderData } from \"remix\";\r\ntype Post = {\r\n  slug: string;\r\n  title: string;\r\n};\r\n\r\nexport let loader = () => {\r\n  let posts: Post[] = [\r\n    {\r\n      slug: \"my-first-post\",\r\n      title: \"My First Post\",\r\n    },\r\n    {\r\n      slug: \"90s-mixtape\",\r\n      title: \"A Mixtape I Made Just For You\",\r\n    },\r\n  ];\r\n  return posts;\r\n};\r\n\r\nexport default function Posts() {\r\n  let posts = useLoaderData<Post[]>();\r\n\r\n  console.log(posts);\r\n  return (\r\n    <div>\r\n      <h1>Posts</h1>\r\n      <ul>\r\n        {posts.map((post) => (\r\n          <li key={post.slug}>\r\n            <Link to={post.slug}>{post.title}</Link>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </div>\r\n  );\r\n}\r\n"
+    }
+  ]
+}
